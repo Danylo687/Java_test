@@ -6,7 +6,7 @@ import lombok.*;
 import java.util.Set;
 import java.util.HashSet;
 
-@Entity // Додано анотацію @Entity
+@Entity
 @Getter
 @Setter
 @NoArgsConstructor
@@ -23,6 +23,9 @@ public class Product {
     private String producer;
 
     private String CountryOfOrigin;
+
+    private double weight;
+
     private String description;
 
     private BigDecimal price;
@@ -38,5 +41,6 @@ public class Product {
             inverseJoinColumns = @JoinColumn(name = "store_id")
     )
     private Set<Store> stores = new HashSet<>();
+
 
 }
