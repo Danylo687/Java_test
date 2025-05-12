@@ -20,6 +20,11 @@ public class Product {
 
     private String name;
 
+    private String producer;
+
+    private String CountryOfOrigin;
+    private String description;
+
     private BigDecimal price;
 
     @ManyToOne
