@@ -10,6 +10,10 @@ import lombok.*;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * Represents a store in the system.
+ * Each store can have multiple products associated with it.
+ */
 @Entity
 @Table(name = "store")
 @Getter
@@ -41,4 +45,30 @@ public class Store {
     @Builder.Default
     @ManyToMany(mappedBy = "stores", fetch = FetchType.LAZY)
     private Set<Product> products = new HashSet<>();
+
+    /**
+     * Adds a product to the store's list of products.
+     * @param product the product to add
+     */
+    public void addProduct(Product product) {
+        products.add(product);
+        product.getStores().add(this);
+    }
+
+    /**
+     * Removes a product from the store's list of products.
+     * @param product the product to remove
+     */
+    public void removeProduct(Product product) {
+        products.remove(product);
+        product.getStores().remove(this);
+    }
+
+    /**
+     * Retrieves all products in the store.
+     * @return the set of products
+     */
+    public Set<Product> getProducts() {
+        return products;
+    }
 }

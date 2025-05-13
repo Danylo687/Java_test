@@ -30,10 +30,12 @@ public class Product {
 
     private BigDecimal price;
 
+
     @ManyToOne
     @JoinColumn(name = "category_id")
     private Category category;
 
+    @Builder.Default
     @ManyToMany
     @JoinTable(
             name = "product_store",
@@ -42,5 +44,21 @@ public class Product {
     )
     private Set<Store> stores = new HashSet<>();
 
+    /**
+     * Adds a store to the product's list of stores.
+     * @param store the store to add
+     */
+    public void addStore(Store store) {
+        stores.add(store);
+        store.getProducts().add(this);
+    }
 
+    /**
+     * Removes a store from the product's list of stores.
+     * @param store the store to remove
+     */
+    public void removeStore(Store store) {
+        stores.remove(store);
+        store.getProducts().remove(this);
+    }
 }

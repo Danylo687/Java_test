@@ -40,8 +40,46 @@ public class Customer {
     private String password;
 
     @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<Purchase> purchases = new ArrayList<>();
 
     @OneToMany(mappedBy = "customer", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<Purchase> favorites = new ArrayList<>();
+
+    /**
+     * Adds a purchase to the customer's list of purchases.
+     * @param purchase the purchase to add
+     */
+    public void addPurchase(Purchase purchase) {
+        purchases.add(purchase);
+        purchase.setCustomer(this);
+    }
+
+    /**
+     * Removes a purchase from the customer's list of purchases.
+     * @param purchase the purchase to remove
+     */
+    public void removePurchase(Purchase purchase) {
+        purchases.remove(purchase);
+        purchase.setCustomer(null);
+    }
+
+    /**
+     * Adds a product to the customer's list of favorites.
+     * @param favorite the product to add
+     */
+    public void addFavorite(Purchase favorite) {
+        favorites.add(favorite);
+        favorite.setCustomer(this);
+    }
+
+    /**
+     * Removes a product from the customer's list of favorites.
+     * @param favorite the product to remove
+     */
+    public void removeFavorite(Purchase favorite) {
+        favorites.remove(favorite);
+        favorite.setCustomer(null);
+    }
 }

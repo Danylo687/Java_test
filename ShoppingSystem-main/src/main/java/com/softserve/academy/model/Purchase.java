@@ -25,7 +25,6 @@ import org.springframework.format.annotation.DateTimeFormat;
 @EqualsAndHashCode
 @ToString(exclude = {"customer", "product"})
 @Builder
-
 public class Purchase {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -55,4 +54,42 @@ public class Purchase {
     @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME)
     @JsonFormat(pattern = "yyyy-MM-dd'T'HH:mm:ss")
     private LocalDateTime purchaseDate;
+
+    /**
+     * Calculates the total price based on the product price and quantity.
+     * Assumes the product has a `getPrice()` method.
+     */
+    public void calculateTotalPrice() {
+        if (product != null && product.getPrice() != null) {
+            this.totalPrice = product.getPrice().multiply(BigDecimal.valueOf(quantity));
+        } else {
+            this.totalPrice = BigDecimal.ZERO;
+        }
+    }
+
+    /**
+     * Updates the purchase date to the current date and time.
+     */
+    public void updatePurchaseDate() {
+        this.purchaseDate = LocalDateTime.now();
+    }
+
+    /**
+     * Validates if the purchase is valid based on its fields.
+     * Throws an IllegalArgumentException if validation fails.
+     */
+    public void validatePurchase() {
+        if (customer == null) {
+            throw new IllegalArgumentException("Customer cannot be null");
+        }
+        if (product == null) {
+            throw new IllegalArgumentException("Product cannot be null");
+        }
+        if (totalPrice == null || totalPrice.compareTo(BigDecimal.ZERO) < 0) {
+            throw new IllegalArgumentException("Total price must be zero or positive");
+        }
+        if (purchaseDate == null || purchaseDate.isBefore(LocalDateTime.now())) {
+            throw new IllegalArgumentException("Purchase date must be in the present or future");
+        }
+    }
 }
