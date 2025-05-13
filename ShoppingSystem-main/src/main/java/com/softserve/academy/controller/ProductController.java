@@ -44,10 +44,7 @@ public class ProductController {
     @GetMapping
     public ResponseEntity<List<Product>> getAllProducts() {
         List<Product> products = productService.getAllProducts();
-        if (products.isEmpty()) {
-            return ResponseEntity.noContent().build(); // Return 204 if no products
-        }
-        return ResponseEntity.ok(products);
+        return ResponseEntity.ok(products); // Завжди повертаємо статус 200 OK зі списком (може бути порожнім)
     }
 
     // Update an existing product
