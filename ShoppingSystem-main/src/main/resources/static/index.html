@@ -427,6 +427,12 @@
                 productForm.reset();
                 showMessage('Продукт успішно додано!', 'success');
                 await fetchProducts();
+                // У renderProductList, після додавання елементів:
+                document.querySelectorAll('.cancel-button').forEach(button => {
+                    button.addEventListener('click', () => { // Можна передати button.dataset.id, якщо потрібно
+                        handleCancel(); // id не обов'язково передавати, якщо логіка не залежить від нього
+                    });
+                });
             } else {
                 const errorMessage = await response.json();
                 showMessage(`Помилка: ${errorMessage.message || 'Не вдалося додати продукт'}`, 'error');
@@ -450,20 +456,39 @@
     }
 
     async function handleSave(id) {
-        if (!editedNameValue.trim() || !editedDescriptionValue.trim() || !editedPriceValue) {
+        // Отримуємо актуальні значення з полів форми редагування
+        const nameInput = document.getElementById(`edit-name-${id}`);
+        const descriptionInput = document.getElementById(`edit-description-${id}`);
+        const priceInput = document.getElementById(`edit-price-${id}`);
+
+        // Перевіряємо, чи елементи існують (про всяк випадок)
+        if (!nameInput || !descriptionInput || !priceInput) {
+            showMessage('Помилка: не вдалося знайти поля для редагування.', 'error');
+            return;
+        }
+
+        const name = nameInput.value.trim();
+        const description = descriptionInput.value.trim();
+        const price = priceInput.value.trim();
+
+        if (!name || !description || !price) {
             showMessage('Будь ласка, заповніть всі поля для редагування!', 'error');
             return;
         }
-        const priceValue = Number(editedPriceValue);
+        const priceValue = Number(price);
         if (isNaN(priceValue) || priceValue <= 0) {
             showMessage('Введіть коректну ціну (число більше 0).', 'error');
             return;
         }
 
         const updatedProduct = {
-            name: editedNameValue,
-            description: editedDescriptionValue,
-            price: priceValue,
+            name: name, // Використовуємо актуальне значення
+            description: description, // Використовуємо актуальне значення
+            price: priceValue, // Використовуємо актуальне значення
+            // ВАЖЛИВО: Додайте інші поля, якщо вони є у моделі Product на бекенді
+            // і якщо фронтенд повинен ними керувати.
+            // Наприклад, якщо є producer:
+            // producer: document.getElementById(`edit-producer-${id}`).value,
         };
 
         try {
@@ -477,18 +502,29 @@
 
             if (response.ok) {
                 showMessage('Продукт успішно оновлено!', 'success');
-                await fetchProducts();
-                editingId = null;
-                editedNameValue = '';
-                editedDescriptionValue='';
-                editedPriceValue='';
+                editingId = null; // Скидаємо стан редагування
+                // editedNameValue = ''; // Більше не потрібні, якщо не використовуються для ре-рендеру
+                // editedDescriptionValue = '';
+                // editedPriceValue = '';
+                await fetchProducts(); // Оновлюємо список продуктів
             } else {
-                const errorMessage = await response.json();
-                showMessage(`Помилка оновлення: ${errorMessage.message || 'Не вдалося оновити продукт'}`, 'error');
+                const errorData = await response.text(); // Спробуйте отримати текст, якщо JSON не вдається
+                try {
+                    const errorMessage = JSON.parse(errorData);
+                    showMessage(`Помилка оновлення: ${errorMessage.message || 'Не вдалося оновити продукт'}`, 'error');
+                } catch (e) {
+                    showMessage(`Помилка оновлення: ${errorData || 'Не вдалося оновити продукт'}`, 'error');
+                }
             }
         } catch (error) {
             showMessage(`Помилка: ${error.message}`, 'error');
         }
+    }
+
+    function handleCancel() {
+        editingId = null; // Скидаємо ID продукту, що редагується
+        // Немає потреби скидати editedNameValue тощо, якщо handleSave виправлено
+        renderProductList(); // Перемальовуємо список, щоб прибрати форму редагування
     }
 
     async function handleDelete(id) {

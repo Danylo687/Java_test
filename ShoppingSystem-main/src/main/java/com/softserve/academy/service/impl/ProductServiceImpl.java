@@ -45,28 +45,32 @@ public class ProductServiceImpl implements ProductService {
     }
 
     @Override
+    // У ProductServiceImpl -> updateProduct
     public Product updateProduct(Long id, Product productDetails) {
         Product product = productRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Product not found with id: " + id)); // Or a custom exception
+                .orElseThrow(() -> new RuntimeException("Product not found with id: " + id));
 
-        product.setName(productDetails.getName());
-        product.setProducer(productDetails.getProducer());
-        product.setCountryOfOrigin(productDetails.getCountryOfOrigin());
-        product.setWeight(productDetails.getWeight());
-        product.setDescription(productDetails.getDescription());
-        product.setPrice(productDetails.getPrice());
-        // Handle category update carefully, perhaps by ID
-        if (productDetails.getCategory() != null && productDetails.getCategory().getId() != null) {
-            // Category category = categoryRepository.findById(productDetails.getCategory().getId())
-            // .orElseThrow(() -> new RuntimeException("Category not found"));
-            // product.setCategory(category);
-            product.setCategory(productDetails.getCategory()); // Simplified for now
-        } else {
-            product.setCategory(null);
+        if (productDetails.getName() != null) {
+            product.setName(productDetails.getName());
         }
-        // Handle stores update if necessary
-        // product.setStores(productDetails.getStores());
-
+        if (productDetails.getDescription() != null) {
+            product.setDescription(productDetails.getDescription());
+        }
+        if (productDetails.getPrice() != null) { // Для BigDecimal/Double перевіряйте на null
+            product.setPrice(productDetails.getPrice());
+        }
+        if (productDetails.getProducer() != null) {
+            product.setProducer(productDetails.getProducer());
+        }
+        // ... і так далі для countryOfOrigin, weight, category
+        if (productDetails.getCategory() != null /* && productDetails.getCategory().getId() != null */) {
+            // Логіка оновлення категорії
+            product.setCategory(productDetails.getCategory());
+        } else {
+            // Якщо productDetails.getCategory() is null, чи потрібно встановлювати null в product.setCategory?
+            // Можливо, якщо category не передано, його не слід змінювати.
+        }
+        // ...
         return productRepository.save(product);
     }
 

@@ -44,10 +44,10 @@ public class ProductController {
     // Get a single product by ID
     // GET http://localhost:8080/api/products/{id}
     @GetMapping("/{id}")
-    public ResponseEntity<Product> getProductById(@PathVariable Long id) {
+    public ResponseEntity<Product> getProductById(@PathVariable("id") Long id) { // Додано ("id")
         return productService.getProductById(id)
-                .map(ResponseEntity::ok) // If product exists, wrap in ResponseEntity.ok()
-                .orElse(ResponseEntity.notFound().build()); // If not found, return 404
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
     }
 
     // Get all products
@@ -61,11 +61,11 @@ public class ProductController {
     // Update an existing product
     // PUT http://localhost:8080/api/products/{id}
     @PutMapping("/{id}")
-    public ResponseEntity<Product> updateProduct(@PathVariable Long id, @Valid @RequestBody Product productDetails) {
+    public ResponseEntity<Product> updateProduct(@PathVariable("id") Long id, @Valid @RequestBody Product productDetails) { // Додано ("id")
         try {
             Product updatedProduct = productService.updateProduct(id, productDetails);
             return ResponseEntity.ok(updatedProduct);
-        } catch (RuntimeException e) { // Catch specific exceptions like ResourceNotFoundException
+        } catch (RuntimeException e) {
             return ResponseEntity.notFound().build();
         }
     }
@@ -73,11 +73,11 @@ public class ProductController {
     // Delete a product
     // DELETE http://localhost:8080/api/products/{id}
     @DeleteMapping("/{id}")
-    public ResponseEntity<HttpStatus> deleteProduct(@PathVariable Long id) {
+    public ResponseEntity<HttpStatus> deleteProduct(@PathVariable("id") Long id) { // Додано ("id")
         try {
             productService.deleteProduct(id);
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT); // Return 204 on successful deletion
-        } catch (RuntimeException e) { // Catch specific exceptions
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        } catch (RuntimeException e) {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
     }
