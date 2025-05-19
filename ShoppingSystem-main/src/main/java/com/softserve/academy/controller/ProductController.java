@@ -55,7 +55,7 @@ public class ProductController {
     @GetMapping
     public ResponseEntity<List<Product>> getAllProducts() {
         List<Product> products = productService.getAllProducts();
-        return ResponseEntity.ok(products); // Завжди повертаємо статус 200 OK зі списком (може бути порожнім)
+        return ResponseEntity.ok(products);
     }
 
     // Update an existing product

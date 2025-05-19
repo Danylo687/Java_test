@@ -1,0 +1,11 @@
+<h1>Клієнти</h1>
+<div id="customer-list"></div>
+<form id="add-customer-form">
+    <label for="name">Ім'я:</label><input type="text" id="name" name="name" required><br>
+    <label for="email">Email:</label><input type="email" id="email" name="email" required><br>
+    <label for="phoneNumber">Телефон:</label><input type="text" id="phoneNumber" name="phoneNumber"><br>
+    <label for="password">Пароль:</label><input type="password" id="password" name="password" required><br>
+    <button type="submit">Зберегти</button>
+</form>
+<button onclick="showAddCustomerForm()">Додати клієнта</button>
+<button onclick="fetchCustomers()">Оновити список клієнтів</button>
