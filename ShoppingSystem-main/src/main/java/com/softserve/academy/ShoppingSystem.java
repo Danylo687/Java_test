@@ -12,6 +12,6 @@ public class ShoppingSystem {
     public static void main(String[] args) {
         SpringApplication.run(ShoppingSystem.class, args);
         System.out.println("ShoppingSystem web application started successfully!");
-        System.out.println("Access the API endpoints, for example, via http://localhost:8080/api/products");
+        System.out.println("Access the API endpoints, for example, via http://localhost:8080/");
     }
 }

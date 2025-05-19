@@ -8,6 +8,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid; // For validation if you use DTOs with validation annotations
+import org.springframework.web.servlet.view.RedirectView;
+
 import java.util.List;
 
 @RestController
@@ -15,6 +17,15 @@ import java.util.List;
 public class ProductController {
 
     private final ProductService productService;
+
+//    @GetMapping("/")
+//    public String index() {
+//        return "index.html"; // Повертаємо ім'я файлу index.html
+//    }
+    @GetMapping("/")
+    public RedirectView redirectToAddProduct() {
+        return new RedirectView("/index.html");
+    }
 
     @Autowired
     public ProductController(ProductService productService) {
