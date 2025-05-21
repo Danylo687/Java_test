@@ -63,4 +63,8 @@ public class Product {
         stores.remove(store);
         store.getProducts().remove(this);
     }
+
+    public String getCategoryName() {
+        return (this.category != null) ? this.category.getName() : null;
+    }
 }

@@ -12,4 +12,7 @@ public interface ProductService {
     void deleteProduct(Long id);
     List<Product> findByName(String name);
     // Add other business logic methods as needed
+
+    // НОВИЙ МЕТОД: Знайти продукти за ID категорії
+    public List<Product> findByCategoryId(Long categoryId);
 }
