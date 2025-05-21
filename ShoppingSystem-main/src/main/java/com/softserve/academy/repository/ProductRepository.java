@@ -20,6 +20,6 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     // Find products by producer
     List<Product> findByProducerContainingIgnoreCase(String producer);
 
-    // You can add more custom query methods here as needed
-    // For example, find products within a certain price range, etc.
+    // НОВИЙ МЕТОД: Spring Data JPA автоматично реалізує це
+    List<Product> findByCategoryId(Long categoryId);
 }

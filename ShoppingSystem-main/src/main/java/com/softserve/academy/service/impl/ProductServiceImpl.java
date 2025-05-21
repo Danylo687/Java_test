@@ -58,4 +58,10 @@ public class ProductServiceImpl implements ProductService {
     public List<Product> findByName(String name) {
         return productRepository.findByNameContainingIgnoreCase(name);
     }
+
+
+    // НОВИЙ МЕТОД: Знайти продукти за ID категорії
+    public List<Product> findByCategoryId(Long categoryId) {
+        return productRepository.findByCategoryId(categoryId);
+    }
 }

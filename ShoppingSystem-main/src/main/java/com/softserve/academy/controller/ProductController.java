@@ -1,6 +1,7 @@
 package com.softserve.academy.controller;
 
 import com.softserve.academy.model.Product;
+import com.softserve.academy.model.ProductDTO;
 import com.softserve.academy.service.ProductService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -11,6 +12,7 @@ import jakarta.validation.Valid; // For validation if you use DTOs with validati
 import org.springframework.web.servlet.view.RedirectView;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/products") // Base path for all product-related endpoints
@@ -92,4 +94,31 @@ public class ProductController {
         }
         return ResponseEntity.ok(products);
     }
+
+
+    // НОВИЙ МЕТОД: Отримати продукти за ID категорії
+    @GetMapping("/category/{categoryId}")
+    public List<ProductDTO> getProductsByCategoryId(@PathVariable Long categoryId) {
+        return productService.findByCategoryId(categoryId).stream()
+                .map(product -> {
+                    ProductDTO dto = new ProductDTO();
+                    dto.setId(product.getId());
+                    dto.setName(product.getName());
+                    dto.setPrice(product.getPrice());
+                    dto.setProducer(product.getProducer());
+                    dto.setCountryOfOrigin(product.getCountryOfOrigin());
+                    dto.setWeight(product.getWeight() != 0 ? product.getWeight() : 0); // Перетворення BigDecimal на Double
+                    dto.setDescription(product.getDescription());
+                    if (product.getCategory() != null) {
+                        dto.setCategoryId(product.getCategory().getId());
+                        dto.setCategoryName(product.getCategory().getName());
+                    }
+                    return dto;
+                })
+                .collect(Collectors.toList());
+    }
+
+    // Якщо ви використовуєте ProductDTO, то ваш існуючий метод getAllProducts() також має повертати List<ProductDTO>
+    // Якщо у вас вже є ProductDTO, переконайтеся, що він включає всі необхідні поля та має геттери/сеттери
+    // public List<ProductDTO> getAllProducts() { ... }
 }
