@@ -1,5 +1,6 @@
 package com.softserve.academy.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
@@ -44,6 +45,7 @@ public class Store {
 
     @Builder.Default
     @ManyToMany(mappedBy = "stores", fetch = FetchType.LAZY)
+    @JsonIgnore // Додано: Ігнорувати список продуктів при серіалізації магазину
     private Set<Product> products = new HashSet<>();
 
     /**

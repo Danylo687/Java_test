@@ -1,5 +1,6 @@
 package com.softserve.academy.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 import lombok.*;
@@ -42,6 +43,7 @@ public class Product {
             joinColumns = @JoinColumn(name = "product_id"),
             inverseJoinColumns = @JoinColumn(name = "store_id")
     )
+    @JsonIgnore // Додано: Ігнорувати список магазинів при серіалізації продукту
     private Set<Store> stores = new HashSet<>();
 
     /**

@@ -1,5 +1,6 @@
 package com.softserve.academy.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -50,6 +51,7 @@ public class Category {
      * Retrieves all products in the category.
      * @return the list of products
      */
+    @JsonIgnore
     public List<Product> getProducts() {
         return products;
     }

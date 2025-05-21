@@ -1,6 +1,7 @@
 package com.softserve.academy.model;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.FutureOrPresent;
@@ -33,10 +34,12 @@ public class Purchase {
     @NotNull(message = "Customer cannot be null")
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "customer_id", nullable = false)
+    @JsonIgnore // Додано: Ігнорувати список покупок при серіалізації клієнта
     private Customer customer;
 
     @ManyToOne
     @JoinColumn(name = "product_id", nullable = false)
+    @JsonIgnore // Додано: Ігнорувати список покупок при серіалізації клієнта
     private Product product;
 
     @Column(nullable = false)
