@@ -1,20 +1,13 @@
 const contentDiv = document.getElementById('content');
 
 function showProducts() {
-    contentDiv.innerHTML = `
-        <h1>Продукти</h1>
-        <div id="product-list">
-            </div>
-        <button onclick="showAddProductForm()">Додати продукт</button>
-        <div id="add-product-form" style="display:none;">
-            </div>
-    `;
-    fetchProducts();
-    // Assuming the form is already present in products.html or loaded differently
-    const addProductForm = document.getElementById('add-product-form');
-    if (addProductForm) {
-        addProductForm.addEventListener('submit', handleAddProduct);
-    }
+    fetch('products.html')
+        .then(response => response.text())
+        .then(html => {
+            contentDiv.innerHTML = html;
+            fetchProducts();
+            document.getElementById('add-product-form').addEventListener('submit', handleAddProduct);
+        });
 }
 
 function showCustomers() {
