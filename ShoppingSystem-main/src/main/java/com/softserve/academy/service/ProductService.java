@@ -13,16 +13,12 @@ public interface ProductService {
     Product updateProduct(Long id, Product productDetails);
     void deleteProduct(Long id);
     List<Product> findByName(String name);
-    // Add other business logic methods as needed
 
-    // НОВИЙ МЕТОД: Знайти продукти за ID категорії
     public List<Product> findByCategoryId(Long categoryId);
 
-    // ДОДАНО: Нові методи для роботи з ProductDTO
     ProductDTO saveProductDTO(ProductDTO productDTO);
     Optional<ProductDTO> getProductDTOById(Long id);
     List<ProductDTO> getAllProductDTOs();
     ProductDTO updateProductDTO(Long id, ProductDTO productDTO);
     List<ProductDTO> findProductDTOsByCategoryId(Long categoryId);
-    // Можливо, також знадобиться метод deleteProduct, який приймає ID, він вже є.
 }

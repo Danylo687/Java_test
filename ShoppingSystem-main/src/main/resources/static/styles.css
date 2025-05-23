@@ -1,109 +1,134 @@
 body {
-    font-family: 'Inter', sans-serif;
-    background-color: #f4f4f9;
+    font-family: 'Roboto', Arial, sans-serif; /* A strong, clear sans-serif font */
+    background-color: #1a1a1a; /* Very dark background, almost black */
+    color: #c0c0c0; /* Lighter gray for main text for good contrast */
     margin: 0;
     padding: 0;
     display: flex;
-    justify-content: center;
-    align-items: flex-start;
+    justify-content: flex-start; /* Align content to start, similar to many professional sites */
+    align-items: center;
     min-height: 100vh;
     flex-direction: column;
-    padding-top: 20px;
+    padding-top: 30px; /* More padding at the top */
 }
 
 #main-nav {
     display: flex;
     justify-content: center;
-    margin-bottom: 20px;
+    width: 100%;
+    background-color: #282828; /* Slightly lighter dark background for nav */
+    padding: 15px 0;
+    margin-bottom: 30px;
+    border-bottom: 2px solid #444; /* Stronger bottom border */
 }
 
 #main-nav button {
-    padding: 10px 15px;
-    margin: 0 10px;
-    border: none;
-    border-radius: 5px;
-    background-color: #4caf50;
-    color: white;
+    padding: 12px 25px; /* Larger buttons */
+    margin: 0 15px;
+    border: 1px solid #4a4a4a; /* Subtle border for buttons */
+    border-radius: 4px; /* Slightly less rounded */
+    background-color: #3a3a3a; /* Darker button background */
+    color: #eee; /* Lighter text color */
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    font-size: 1.1em; /* Slightly larger font */
+    font-weight: bold; /* Bold text for buttons */
+    text-transform: uppercase; /* Uppercase text */
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 #main-nav button:hover {
-    background-color: #45a049;
+    background-color: #4c4c4c; /* Lighter dark on hover */
+    color: #fff; /* White text on hover */
 }
 
 #content {
     width: 100%;
-    max-width: 800px;
-    padding: 20px;
-    background-color: #ffffff;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-    margin-bottom: 20px;
+    max-width: 900px; /* Slightly wider content area */
+    padding: 30px; /* More padding */
+    background-color: #222; /* Darker content background */
+    border: 1px solid #444; /* Clear border */
+    border-radius: 8px; /* Slightly less rounded corners */
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4); /* More pronounced shadow */
+    margin-bottom: 30px;
 }
 
 h1 {
-    color: #2c3e50;
-    margin-bottom: 20px;
+    color: #e0e0e0; /* Lighter color for headings */
+    margin-bottom: 25px;
     text-align: center;
+    border-bottom: 2px solid #444; /* Stronger bottom border for headings */
+    padding-bottom: 15px;
+    font-size: 2.2em; /* Larger heading */
+    text-transform: uppercase; /* Uppercase for headings */
+    letter-spacing: 1px; /* Spacing for headings */
 }
 
 form {
     display: none;
     flex-direction: column;
-    gap: 15px;
-    padding: 20px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    margin-bottom: 20px;
-    background-color: #f9f9f9;
+    gap: 20px; /* More space between form elements */
+    padding: 25px;
+    border: 1px solid #444;
+    border-radius: 6px;
+    margin-bottom: 25px;
+    background-color: #2e2e2e; /* Form background */
 }
 
 label {
-    font-weight: 500;
-    color: #2c3e50;
+    font-weight: bold;
+    color: #d0d0d0; /* Lighter color for labels */
+    font-size: 1.05em;
 }
 
 input[type="text"],
 input[type="number"],
 input[type="email"],
 input[type="password"],
-textarea {
-    padding: 10px;
-    border: 1px solid #d1d5db;
-    border-radius: 5px;
+textarea,
+select { /* Added select to general input styles */
+    padding: 12px;
+    border: 1px solid #555;
+    border-radius: 4px;
     font-size: 1em;
-    width: 100%; /* Make inputs take full width */
-    box-sizing: border-box; /* Include padding and border in the element's total width */
+    width: 100%;
+    box-sizing: border-box;
+    background-color: #3a3a3a; /* Darker input background */
+    color: #f0f0f0; /* Light text in inputs */
 }
 
 button[type="submit"] {
-    background-color: #4caf50;
+    background-color: #5cb85c; /* A tactical green */
     color: white;
-    padding: 10px 15px;
+    padding: 12px 20px;
     border: none;
-    border-radius: 5px;
+    border-radius: 4px;
     cursor: pointer;
+    font-size: 1.1em;
+    font-weight: bold;
+    text-transform: uppercase;
     transition: background-color 0.3s ease;
 }
 
 button[type="submit"]:hover {
-    background-color: #45a049;
+    background-color: #4cae4c; /* Slightly darker green on hover */
 }
 
 button:not([type="submit"]) {
-    background-color: #007bff;
+    background-color: #4a4a4a; /* Dark gray for other buttons */
     color: white;
-    padding: 10px 15px;
+    padding: 12px 20px;
     border: none;
-    border-radius: 5px;
+    border-radius: 4px;
     cursor: pointer;
+    font-size: 1.1em;
+    font-weight: bold;
+    text-transform: uppercase;
     transition: background-color 0.3s ease;
-    margin-right: 10px;
+    margin-right: 15px; /* More spacing */
 }
 
 button:not([type="submit"]):hover {
-    background-color: #0056b3;
+    background-color: #5a5a5a; /* Lighter gray on hover */
 }
 
 ul {
@@ -112,10 +137,41 @@ ul {
 }
 
 li {
-    padding: 8px 0;
-    border-bottom: 1px solid #eee;
+    padding: 10px 0;
+    border-bottom: 1px dashed #444; /* Dashed border for a more "military" feel */
+    color: #e0e0e0; /* Lighter text color for list items */
+    display: flex; /* Use flexbox for list items */
+    align-items: center;
+    justify-content: space-between; /* Space out content and buttons */
+    word-break: break-word; /* Ensure long content wraps */
 }
 
 li:last-child {
     border-bottom: none;
+}
+
+li img {
+    border: 1px solid #555; /* Border around images */
+    border-radius: 3px; /* Slightly rounded corners for images */
+}
+
+.filter-section {
+    background-color: #2e2e2e;
+    padding: 15px;
+    border-radius: 6px;
+    margin-bottom: 20px;
+    border: 1px solid #444;
+}
+
+.filter-section label {
+    margin-right: 10px;
+    color: #d0d0d0;
+}
+
+.filter-section select {
+    background-color: #3a3a3a;
+    color: #f0f0f0;
+    border: 1px solid #555;
+    padding: 8px;
+    border-radius: 4px;
 }

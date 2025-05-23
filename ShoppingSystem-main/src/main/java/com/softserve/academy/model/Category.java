@@ -7,12 +7,8 @@ import lombok.*;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * Represents a category of products.
- * Each category can have multiple products associated with it.
- */
 @Entity
-@Table(name = "category") // Specifies the table name in the database
+@Table(name = "category")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -23,7 +19,7 @@ public class Category {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true) // Adds constraints for the name field
+    @Column(nullable = false, unique = true)
     private String name;
 
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)

@@ -14,5 +14,4 @@ public interface CustomerService {
     void deleteCustomer(Long id);
 
 
-    //   Optional<Customer> getCustomerByEmail(String email);  // If you add this to the repository
 }

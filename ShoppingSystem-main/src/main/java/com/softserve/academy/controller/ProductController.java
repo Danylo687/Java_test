@@ -21,7 +21,7 @@ import java.util.ArrayList; // Додано
 public class ProductController {
 
     private final ProductService productService;
-    private final CategoryRepository categoryRepository; // ДОДАНО
+    private final CategoryRepository categoryRepository;
 
     @GetMapping("/")
     public RedirectView redirectToAddProduct() {
@@ -34,7 +34,6 @@ public class ProductController {
         this.categoryRepository = categoryRepository;
     }
 
-    // ІСНУЮЧІ МЕТОДИ (НЕ ЗМІНЕНО)
     @PostMapping
     public ResponseEntity<Product> createProduct(@Valid @RequestBody Product product) {
         Product savedProduct = productService.saveProduct(product);
@@ -48,7 +47,7 @@ public class ProductController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @GetMapping // Цей метод повертає List<Product>
+    @GetMapping
     public ResponseEntity<List<Product>> getAllProducts() {
         List<Product> products = productService.getAllProducts();
         return ResponseEntity.ok(products);
@@ -83,37 +82,31 @@ public class ProductController {
         return ResponseEntity.ok(products);
     }
 
-    // НОВИЙ МЕТОД: Отримати продукти за ID категорії (вже був, але тепер використовує ProductDTO)
-    // Цей метод було раніше змінено, щоб повертати List<ProductDTO>, тому я залишаю його як є
     @GetMapping("/category/{categoryId}")
     public List<ProductDTO> getProductsByCategoryId(@PathVariable Long categoryId) {
-        return productService.findProductDTOsByCategoryId(categoryId); // Викликаємо новий DTO-метод
+        return productService.findProductDTOsByCategoryId(categoryId);
     }
 
-    // ========================================================================================================
-    // ДОДАНО: Нові методи контролера для роботи з ProductDTO
-    // ========================================================================================================
-
-    @PostMapping("/dto") // Новий endpoint для створення через DTO
+    @PostMapping("/dto")
     public ResponseEntity<ProductDTO> createProductDTO(@Valid @RequestBody ProductDTO productDTO) {
         ProductDTO savedProductDTO = productService.saveProductDTO(productDTO);
         return new ResponseEntity<>(savedProductDTO, HttpStatus.CREATED);
     }
 
-    @GetMapping("/dto/{id}") // Новий endpoint для отримання DTO за ID
+    @GetMapping("/dto/{id}")
     public ResponseEntity<ProductDTO> getProductDTOById(@PathVariable("id") Long id) {
         return productService.getProductDTOById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    @GetMapping("/dto") // Новий endpoint для отримання всіх DTOs
+    @GetMapping("/dto")
     public ResponseEntity<List<ProductDTO>> getAllProductDTOs() {
         List<ProductDTO> productDTOs = productService.getAllProductDTOs();
         return ResponseEntity.ok(productDTOs);
     }
 
-    @PutMapping("/dto/{id}") // Новий endpoint для оновлення через DTO
+    @PutMapping("/dto/{id}")
     public ResponseEntity<ProductDTO> updateProductDTO(@PathVariable("id") Long id, @Valid @RequestBody ProductDTO productDetailsDTO) {
         try {
             ProductDTO updatedProductDTO = productService.updateProductDTO(id, productDetailsDTO);

@@ -10,16 +10,11 @@ import java.util.List;
 @Repository
 public interface ProductRepository extends JpaRepository<Product, Long> {
 
-    // Find products by name (case-insensitive search)
     List<Product> findByNameContainingIgnoreCase(String name);
 
-
-    // Find products by category
     List<Product> findByCategory(Category category);
 
-    // Find products by producer
     List<Product> findByProducerContainingIgnoreCase(String producer);
 
-    // НОВИЙ МЕТОД: Spring Data JPA автоматично реалізує це
     List<Product> findByCategoryId(Long categoryId);
 }

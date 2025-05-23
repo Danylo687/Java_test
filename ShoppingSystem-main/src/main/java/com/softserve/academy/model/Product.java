@@ -33,14 +33,11 @@ public class Product {
 
     private BigDecimal price;
 
-    // Додано: Поле для списку посилань на зображення
-    // Використовуємо @ElementCollection для збереження списку примітивних типів
-    // У базі даних це може бути окрема таблиця або JSON-масив у деяких БД (залежить від конфігурації JPA/Hibernate)
     @ElementCollection
     @CollectionTable(name = "product_images", joinColumns = @JoinColumn(name = "product_id"))
     @Column(name = "image_url")
-    @Builder.Default // Додано: Для Lombok Builder, щоб ініціалізувати поле за замовчуванням
-    private List<String> imageUrls = new ArrayList<>(); // Додано: Ініціалізація, щоб уникнути NullPointerException
+    @Builder.Default
+    private List<String> imageUrls = new ArrayList<>();
 
 
     @ManyToOne
@@ -54,7 +51,7 @@ public class Product {
             joinColumns = @JoinColumn(name = "product_id"),
             inverseJoinColumns = @JoinColumn(name = "store_id")
     )
-    @JsonIgnore // Додано: Ігнорувати список магазинів при серіалізації продукту
+    @JsonIgnore
     private Set<Store> stores = new HashSet<>();
 
     /**

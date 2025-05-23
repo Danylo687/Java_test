@@ -5,7 +5,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories; // Ensure JPA repositories are scanned
 
 @SpringBootApplication
-// Ensure your repositories are in a sub-package of com.softserve.academy or specify the base package
 @EnableJpaRepositories(basePackages = "com.softserve.academy.repository")
 public class ShoppingSystem {
 

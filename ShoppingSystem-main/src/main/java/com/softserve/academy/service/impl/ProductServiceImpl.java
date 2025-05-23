@@ -51,8 +51,6 @@ public class ProductServiceImpl implements ProductService {
                     existingProduct.setWeight(productDetails.getWeight());
                     existingProduct.setDescription(productDetails.getDescription());
                     existingProduct.setPrice(productDetails.getPrice());
-                    // Якщо Product updateProduct не оновлював imageUrls, ми не додаємо тут
-                    // existingProduct.setImageUrls(productDetails.getImageUrls());
                     return productRepository.save(existingProduct);
                 })
                 .orElseThrow(() -> new RuntimeException("Product not found with id: " + id));
@@ -72,10 +70,6 @@ public class ProductServiceImpl implements ProductService {
     public List<Product> findByCategoryId(Long categoryId) {
         return productRepository.findByCategoryId(categoryId);
     }
-
-    // ========================================================================================================
-    // Реалізація нових методів для ProductDTO
-    // ========================================================================================================
 
     @Override
     public ProductDTO saveProductDTO(ProductDTO productDTO) {
@@ -116,7 +110,6 @@ public class ProductServiceImpl implements ProductService {
             existingProduct.setCategory(null);
         }
 
-        // ВИПРАВЛЕНО: Уникнення тернарного оператора
         if (productDTO.getImageUrls() != null) {
             existingProduct.setImageUrls(new ArrayList<>(productDTO.getImageUrls()));
         } else {
@@ -134,10 +127,6 @@ public class ProductServiceImpl implements ProductService {
                 .collect(Collectors.toList());
     }
 
-    // ========================================================================================================
-    // ДОПОМІЖНІ МЕТОДИ ДЛЯ ПЕРЕТВОРЕННЯ (Product <-> ProductDTO)
-    // ========================================================================================================
-
     private ProductDTO convertToDto(Product product) {
         ProductDTO dto = new ProductDTO();
         dto.setId(product.getId());
@@ -152,7 +141,6 @@ public class ProductServiceImpl implements ProductService {
             dto.setCategoryName(product.getCategory().getName());
         }
 
-        // ВИПРАВЛЕНО: Уникнення тернарного оператора та забезпечення не-null
         if (product.getImageUrls() != null) {
             dto.setImageUrls(new ArrayList<>(product.getImageUrls()));
         } else {

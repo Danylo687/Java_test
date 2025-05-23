@@ -45,7 +45,7 @@ public class Store {
 
     @Builder.Default
     @ManyToMany(mappedBy = "stores", fetch = FetchType.LAZY)
-    @JsonIgnore // Додано: Ігнорувати список продуктів при серіалізації магазину
+    @JsonIgnore
     private Set<Product> products = new HashSet<>();
 
     /**

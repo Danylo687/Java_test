@@ -13,13 +13,12 @@ public class ProductDTO {
     private String description;
     private Long categoryId;
     private String categoryName;
-    private List<String> imageUrls; // Додано: Список посилань на зображення
+    private List<String> imageUrls;
 
-    // Конструктор без аргументів
+
     public ProductDTO() {
     }
 
-    // Конструктор з усіма аргументами (можете створити, якщо потрібно)
     public ProductDTO(Long id, String name, BigDecimal price, String producer,
                       String countryOfOrigin, Double weight, String description,
                       Long categoryId, String categoryName) {
@@ -34,7 +33,6 @@ public class ProductDTO {
         this.categoryName = categoryName;
     }
 
-    // Гетери
     public Long getId() {
         return id;
     }
@@ -116,5 +114,5 @@ public class ProductDTO {
         this.imageUrls = imageUrls;
     }
 
-    // Також можуть бути додані методи equals(), hashCode(), toString()
+
 }

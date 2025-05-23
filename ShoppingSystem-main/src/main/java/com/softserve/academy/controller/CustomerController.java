@@ -70,12 +70,4 @@ public class CustomerController {
         }
     }
 
-
-    //   Example:  Get customer by email (if you added that to the repository)
-    //   @GetMapping("/email/{email}")
-    //   public ResponseEntity<Customer> getCustomerByEmail(@PathVariable String email) {
-    //       return customerService.getCustomerByEmail(email)
-    //               .map(ResponseEntity::ok)
-    //               .orElse(ResponseEntity.notFound().build());
-    //   }
 }

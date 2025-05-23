@@ -29,9 +29,6 @@ function showCategories() {
         });
 }
 
-// =====================================================================================================================
-
-// НОВА ФУНКЦІЯ: Ініціалізація сторінки продуктів з фільтром
 function showProductsWithFilter() {
     fetch('products.html')
         .then(response => {
@@ -61,40 +58,26 @@ function showProductsWithFilter() {
         });
 }
 
-// НОВА ФУНКЦІЯ: для показу форми додавання продукту (якщо потрібно)
 function showAddProductFormNew() {
     const addProductFormContainer = document.getElementById('add-product-form');
-    // Отримаємо доступ до самої форми, а не лише до контейнера
     const productAddEditForm = document.getElementById('product-add-edit-form');
 
     if (addProductFormContainer && productAddEditForm) {
         addProductFormContainer.style.display = 'block';
-        productAddEditForm.style.display = 'block'; // Переконаємось, що сама форма також видима
-
-        // **ВИДАЛЕНО: document.getElementById('product-add-edit-form').reset();**
-        // Цей рядок очищав форму, навіть коли ви відкривали її для редагування.
-
-        // Цю логіку краще перенести в handleEditProductNew для встановлення заголовка
-        // document.getElementById('product-add-edit-form').querySelector('h2').textContent = 'Додати новий продукт';
-
-        // Очищаємо ID та поле для зображень тільки якщо це точно нова форма
-        // Якщо id вже встановлено (тобто, це редагування), ми не хочемо його очищати
-        if (document.getElementById('id').value === '') { // Перевіряємо, чи ID пустий
-            document.getElementById('product-add-edit-form').reset(); // Очищаємо форму тільки для нового продукту
+        productAddEditForm.style.display = 'block';
+        if (document.getElementById('id').value === '') {
+            document.getElementById('product-add-edit-form').reset();
             document.getElementById('id').value = '';
             const imageUrlsInput = document.getElementById('imageUrls');
             if (imageUrlsInput) imageUrlsInput.value = '';
             document.getElementById('product-add-edit-form').querySelector('h2').textContent = 'Додати новий продукт';
         }
 
-        fetchCategoriesForProductFormDropdownNew(); // Завжди завантажуємо категорії
+        fetchCategoriesForProductFormDropdownNew();
     } else {
         console.error("Елемент 'add-product-form' або 'product-add-edit-form' не знайдено. Перевірте, чи є він у products.html.");
     }
 }
-
-
-// НОВА ФУНКЦІЯ: Завантаження продукту для редагування
 async function handleEditProductNew(productId) {
     try {
         const response = await fetch(`/api/products/dto/${productId}`);
@@ -103,7 +86,6 @@ async function handleEditProductNew(productId) {
         }
         const product = await response.json();
 
-        // Заповнюємо форму даними продукту
         document.getElementById('id').value = product.id;
         document.getElementById('name').value = product.name;
         document.getElementById('price').value = product.price;
@@ -112,9 +94,7 @@ async function handleEditProductNew(productId) {
         document.getElementById('weight').value = product.weight;
         document.getElementById('description').value = product.description;
 
-        // Встановлюємо категорію
         const categorySelect = document.getElementById('category');
-        // Заповнюємо список категорій перед вибором, якщо він ще не заповнений
         await fetchCategoriesForProductFormDropdownNew(); // Важливо, щоб опції були доступні
         if (product.categoryId) {
             categorySelect.value = product.categoryId;
@@ -122,15 +102,12 @@ async function handleEditProductNew(productId) {
             categorySelect.value = ''; // Якщо категорія null, скидаємо вибір
         }
 
-        // Заповнюємо поле imageUrls
         const imageUrlsInput = document.getElementById('imageUrls');
         if (product.imageUrls && product.imageUrls.length > 0) {
             imageUrlsInput.value = product.imageUrls.join(', '); // З'єднуємо URLи комою
         } else {
             imageUrlsInput.value = '';
         }
-
-        // Змінюємо заголовок форми
         document.getElementById('product-add-edit-form').querySelector('h2').textContent = `Редагувати продукт: ${product.name}`;
 
         showAddProductFormNew(); // Показуємо форму. Тепер вона не буде скидатися автоматично.
@@ -140,7 +117,6 @@ async function handleEditProductNew(productId) {
     }
 }
 
-// НОВА ФУНКЦІЯ: для скасування додавання/редагування продукту (якщо потрібно)
 function cancelAddProductNew() {
     const addProductFormContainer = document.getElementById('add-product-form');
     const productAddEditForm = document.getElementById('product-add-edit-form');
@@ -156,7 +132,6 @@ function cancelAddProductNew() {
 }
 
 
-// НОВА ФУНКЦІЯ: Завантаження категорій для випадаючого списку ФІЛЬТРАЦІЇ продуктів
 async function fetchCategoriesForProductFilterDropdown() {
     try {
         const response = await fetch('/api/categories');
@@ -176,7 +151,6 @@ async function fetchCategoriesForProductFilterDropdown() {
     }
 }
 
-// НОВА ФУНКЦІЯ: Завантаження категорій для випадаючого списку у ФОРМІ ДОДАВАННЯ/РЕДАГУВАННЯ продукту
 async function fetchCategoriesForProductFormDropdownNew() {
     try {
         const response = await fetch('/api/categories');
@@ -196,7 +170,6 @@ async function fetchCategoriesForProductFormDropdownNew() {
     }
 }
 
-// НОВА ФУНКЦІЯ: Завантаження продуктів з можливістю фільтрації за категорією
 async function fetchProductsNew(categoryId = null) {
     try {
         let url = '/api/products/dto';
@@ -241,7 +214,6 @@ async function fetchProductsNew(categoryId = null) {
     }
 }
 
-// НОВА ФУНКЦІЯ: Обробка зміни вибору категорії у фільтрі
 function filterProductsByCategory() {
     const categoryFilterSelect = document.getElementById('category-filter');
     const selectedCategoryId = categoryFilterSelect.value;
@@ -253,7 +225,6 @@ function filterProductsByCategory() {
     }
 }
 
-// НОВА ФУНКЦІЯ: Обробник додавання/редагування продукту
 async function handleAddProductNew(event) {
     event.preventDefault();
 
@@ -312,7 +283,6 @@ async function handleAddProductNew(event) {
     }
 }
 
-// НОВА ФУНКЦІЯ: Обробник видалення продукту
 async function handleDeleteProductNew(productId) {
     if (!confirm('Ви впевнені, що хочете видалити цей продукт?')) {
         return;
@@ -336,7 +306,6 @@ async function handleDeleteProductNew(productId) {
     }
 }
 
-// НОВА ФУНКЦІЯ: Завантаження продукту для редагування
 async function handleEditProductNew(productId) {
     try {
         const response = await fetch(`/api/products/dto/${productId}`);
@@ -378,7 +347,6 @@ async function handleEditProductNew(productId) {
 
 window.onload = showProductsWithFilter;
 
-// Функції для клієнтів (без змін)
 function showAddCustomerForm() {
     document.getElementById('add-customer-form').style.display = 'block';
 }
