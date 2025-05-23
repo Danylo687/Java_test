@@ -1,6 +1,7 @@
 package com.softserve.academy.model;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 public class ProductDTO {
     private Long id;
@@ -12,6 +13,7 @@ public class ProductDTO {
     private String description;
     private Long categoryId;
     private String categoryName;
+    private List<String> imageUrls; // Додано: Список посилань на зображення
 
     // Конструктор без аргументів
     public ProductDTO() {
@@ -69,6 +71,10 @@ public class ProductDTO {
         return categoryName;
     }
 
+    public List<String> getImageUrls() {
+        return imageUrls;
+    }
+
     // Сетери
     public void setId(Long id) {
         this.id = id;
@@ -104,6 +110,10 @@ public class ProductDTO {
 
     public void setCategoryName(String categoryName) {
         this.categoryName = categoryName;
+    }
+
+    public void setImageUrls(List<String> imageUrls) {
+        this.imageUrls = imageUrls;
     }
 
     // Також можуть бути додані методи equals(), hashCode(), toString()

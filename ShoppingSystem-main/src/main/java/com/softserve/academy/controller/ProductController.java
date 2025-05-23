@@ -1,69 +1,61 @@
 package com.softserve.academy.controller;
 
 import com.softserve.academy.model.Product;
-import com.softserve.academy.model.ProductDTO;
+import com.softserve.academy.model.ProductDTO; // Додано
 import com.softserve.academy.service.ProductService;
+import com.softserve.academy.repository.CategoryRepository; // Додано
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import jakarta.validation.Valid; // For validation if you use DTOs with validation annotations
+import jakarta.validation.Valid;
 import org.springframework.web.servlet.view.RedirectView;
 
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.ArrayList; // Додано
 
 @RestController
-@RequestMapping("/api/products") // Base path for all product-related endpoints
+@RequestMapping("/api/products")
 public class ProductController {
 
     private final ProductService productService;
+    private final CategoryRepository categoryRepository; // ДОДАНО
 
-//    @GetMapping("/")
-//    public String index() {
-//        return "index.html"; // Повертаємо ім'я файлу index.html
-//    }
     @GetMapping("/")
     public RedirectView redirectToAddProduct() {
         return new RedirectView("/index.html");
     }
 
     @Autowired
-    public ProductController(ProductService productService) {
+    public ProductController(ProductService productService, CategoryRepository categoryRepository) { // ДОДАНО CategoryRepository
         this.productService = productService;
+        this.categoryRepository = categoryRepository;
     }
 
-    // Create a new product
-    // POST http://localhost:8080/api/products
+    // ІСНУЮЧІ МЕТОДИ (НЕ ЗМІНЕНО)
     @PostMapping
     public ResponseEntity<Product> createProduct(@Valid @RequestBody Product product) {
-        // @Valid annotation triggers validation if Product has JSR 303 annotations
         Product savedProduct = productService.saveProduct(product);
         return new ResponseEntity<>(savedProduct, HttpStatus.CREATED);
     }
 
-    // Get a single product by ID
-    // GET http://localhost:8080/api/products/{id}
     @GetMapping("/{id}")
-    public ResponseEntity<Product> getProductById(@PathVariable("id") Long id) { // Додано ("id")
+    public ResponseEntity<Product> getProductById(@PathVariable("id") Long id) {
         return productService.getProductById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    // Get all products
-    // GET http://localhost:8080/api/products
-    @GetMapping
+    @GetMapping // Цей метод повертає List<Product>
     public ResponseEntity<List<Product>> getAllProducts() {
         List<Product> products = productService.getAllProducts();
         return ResponseEntity.ok(products);
     }
 
-    // Update an existing product
-    // PUT http://localhost:8080/api/products/{id}
     @PutMapping("/{id}")
-    public ResponseEntity<Product> updateProduct(@PathVariable("id") Long id, @Valid @RequestBody Product productDetails) { // Додано ("id")
+    public ResponseEntity<Product> updateProduct(@PathVariable("id") Long id, @Valid @RequestBody Product productDetails) {
         try {
             Product updatedProduct = productService.updateProduct(id, productDetails);
             return ResponseEntity.ok(updatedProduct);
@@ -72,10 +64,8 @@ public class ProductController {
         }
     }
 
-    // Delete a product
-    // DELETE http://localhost:8080/api/products/{id}
     @DeleteMapping("/{id}")
-    public ResponseEntity<HttpStatus> deleteProduct(@PathVariable("id") Long id) { // Додано ("id")
+    public ResponseEntity<HttpStatus> deleteProduct(@PathVariable("id") Long id) {
         try {
             productService.deleteProduct(id);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
@@ -84,8 +74,6 @@ public class ProductController {
         }
     }
 
-    // Example: Find products by name
-    // GET http://localhost:8080/api/products/search?name=Smartphone
     @GetMapping("/search")
     public ResponseEntity<List<Product>> findProductsByName(@RequestParam String name) {
         List<Product> products = productService.findByName(name);
@@ -95,30 +83,43 @@ public class ProductController {
         return ResponseEntity.ok(products);
     }
 
-
-    // НОВИЙ МЕТОД: Отримати продукти за ID категорії
+    // НОВИЙ МЕТОД: Отримати продукти за ID категорії (вже був, але тепер використовує ProductDTO)
+    // Цей метод було раніше змінено, щоб повертати List<ProductDTO>, тому я залишаю його як є
     @GetMapping("/category/{categoryId}")
     public List<ProductDTO> getProductsByCategoryId(@PathVariable Long categoryId) {
-        return productService.findByCategoryId(categoryId).stream()
-                .map(product -> {
-                    ProductDTO dto = new ProductDTO();
-                    dto.setId(product.getId());
-                    dto.setName(product.getName());
-                    dto.setPrice(product.getPrice());
-                    dto.setProducer(product.getProducer());
-                    dto.setCountryOfOrigin(product.getCountryOfOrigin());
-                    dto.setWeight(product.getWeight() != 0 ? product.getWeight() : 0); // Перетворення BigDecimal на Double
-                    dto.setDescription(product.getDescription());
-                    if (product.getCategory() != null) {
-                        dto.setCategoryId(product.getCategory().getId());
-                        dto.setCategoryName(product.getCategory().getName());
-                    }
-                    return dto;
-                })
-                .collect(Collectors.toList());
+        return productService.findProductDTOsByCategoryId(categoryId); // Викликаємо новий DTO-метод
     }
 
-    // Якщо ви використовуєте ProductDTO, то ваш існуючий метод getAllProducts() також має повертати List<ProductDTO>
-    // Якщо у вас вже є ProductDTO, переконайтеся, що він включає всі необхідні поля та має геттери/сеттери
-    // public List<ProductDTO> getAllProducts() { ... }
+    // ========================================================================================================
+    // ДОДАНО: Нові методи контролера для роботи з ProductDTO
+    // ========================================================================================================
+
+    @PostMapping("/dto") // Новий endpoint для створення через DTO
+    public ResponseEntity<ProductDTO> createProductDTO(@Valid @RequestBody ProductDTO productDTO) {
+        ProductDTO savedProductDTO = productService.saveProductDTO(productDTO);
+        return new ResponseEntity<>(savedProductDTO, HttpStatus.CREATED);
+    }
+
+    @GetMapping("/dto/{id}") // Новий endpoint для отримання DTO за ID
+    public ResponseEntity<ProductDTO> getProductDTOById(@PathVariable("id") Long id) {
+        return productService.getProductDTOById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/dto") // Новий endpoint для отримання всіх DTOs
+    public ResponseEntity<List<ProductDTO>> getAllProductDTOs() {
+        List<ProductDTO> productDTOs = productService.getAllProductDTOs();
+        return ResponseEntity.ok(productDTOs);
+    }
+
+    @PutMapping("/dto/{id}") // Новий endpoint для оновлення через DTO
+    public ResponseEntity<ProductDTO> updateProductDTO(@PathVariable("id") Long id, @Valid @RequestBody ProductDTO productDetailsDTO) {
+        try {
+            ProductDTO updatedProductDTO = productService.updateProductDTO(id, productDetailsDTO);
+            return ResponseEntity.ok(updatedProductDTO);
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
 }

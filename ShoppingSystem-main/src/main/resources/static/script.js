@@ -5,8 +5,7 @@ function showProducts() {
         .then(response => response.text())
         .then(html => {
             contentDiv.innerHTML = html;
-            fetchProducts();
-            document.getElementById('add-product-form').addEventListener('submit', handleAddProduct);
+            fetchProductsNew();
         });
 }
 
@@ -34,7 +33,7 @@ function showCategories() {
 
 // НОВА ФУНКЦІЯ: Ініціалізація сторінки продуктів з фільтром
 function showProductsWithFilter() {
-    fetch('filter.html')
+    fetch('products.html')
         .then(response => {
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
@@ -44,21 +43,16 @@ function showProductsWithFilter() {
         .then(html => {
             contentDiv.innerHTML = html;
 
-            // Завантажуємо категорії для випадаючого списку фільтрації
             fetchCategoriesForProductFilterDropdown();
-            // Завантажуємо категорії для форми додавання/редагування
             fetchCategoriesForProductFormDropdownNew();
 
-
-            // Отримуємо посилання на саму форму (НЕ на div-контейнер) і додаємо слухача
             const productAddEditForm = document.getElementById('product-add-edit-form');
             if (productAddEditForm) {
-                productAddEditForm.addEventListener('submit', handleAddProductNew); // Використовуємо нову функцію
+                productAddEditForm.addEventListener('submit', handleAddProductNew);
             } else {
                 console.error("Елемент 'product-add-edit-form' не знайдено в products.html. Перевірте ID форми.");
             }
 
-            // Початкове завантаження продуктів (без фільтра)
             fetchProductsNew();
         })
         .catch(error => {
@@ -70,11 +64,79 @@ function showProductsWithFilter() {
 // НОВА ФУНКЦІЯ: для показу форми додавання продукту (якщо потрібно)
 function showAddProductFormNew() {
     const addProductFormContainer = document.getElementById('add-product-form');
-    if (addProductFormContainer) {
+    // Отримаємо доступ до самої форми, а не лише до контейнера
+    const productAddEditForm = document.getElementById('product-add-edit-form');
+
+    if (addProductFormContainer && productAddEditForm) {
         addProductFormContainer.style.display = 'block';
-        fetchCategoriesForProductFormDropdownNew(); // Заповнюємо випадаючий список при показі форми
+        productAddEditForm.style.display = 'block'; // Переконаємось, що сама форма також видима
+
+        // **ВИДАЛЕНО: document.getElementById('product-add-edit-form').reset();**
+        // Цей рядок очищав форму, навіть коли ви відкривали її для редагування.
+
+        // Цю логіку краще перенести в handleEditProductNew для встановлення заголовка
+        // document.getElementById('product-add-edit-form').querySelector('h2').textContent = 'Додати новий продукт';
+
+        // Очищаємо ID та поле для зображень тільки якщо це точно нова форма
+        // Якщо id вже встановлено (тобто, це редагування), ми не хочемо його очищати
+        if (document.getElementById('id').value === '') { // Перевіряємо, чи ID пустий
+            document.getElementById('product-add-edit-form').reset(); // Очищаємо форму тільки для нового продукту
+            document.getElementById('id').value = '';
+            const imageUrlsInput = document.getElementById('imageUrls');
+            if (imageUrlsInput) imageUrlsInput.value = '';
+            document.getElementById('product-add-edit-form').querySelector('h2').textContent = 'Додати новий продукт';
+        }
+
+        fetchCategoriesForProductFormDropdownNew(); // Завжди завантажуємо категорії
     } else {
-        console.error("Елемент 'add-product-form' не знайдено. Перевірте, чи є він у products.html.");
+        console.error("Елемент 'add-product-form' або 'product-add-edit-form' не знайдено. Перевірте, чи є він у products.html.");
+    }
+}
+
+
+// НОВА ФУНКЦІЯ: Завантаження продукту для редагування
+async function handleEditProductNew(productId) {
+    try {
+        const response = await fetch(`/api/products/dto/${productId}`);
+        if (!response.ok) {
+            throw new Error(`Помилка завантаження продукту для редагування: ${response.status} ${response.statusText}`);
+        }
+        const product = await response.json();
+
+        // Заповнюємо форму даними продукту
+        document.getElementById('id').value = product.id;
+        document.getElementById('name').value = product.name;
+        document.getElementById('price').value = product.price;
+        document.getElementById('producer').value = product.producer;
+        document.getElementById('countryOfOrigin').value = product.countryOfOrigin || ''; // Додано || '' для уникнення undefined
+        document.getElementById('weight').value = product.weight;
+        document.getElementById('description').value = product.description;
+
+        // Встановлюємо категорію
+        const categorySelect = document.getElementById('category');
+        // Заповнюємо список категорій перед вибором, якщо він ще не заповнений
+        await fetchCategoriesForProductFormDropdownNew(); // Важливо, щоб опції були доступні
+        if (product.categoryId) {
+            categorySelect.value = product.categoryId;
+        } else {
+            categorySelect.value = ''; // Якщо категорія null, скидаємо вибір
+        }
+
+        // Заповнюємо поле imageUrls
+        const imageUrlsInput = document.getElementById('imageUrls');
+        if (product.imageUrls && product.imageUrls.length > 0) {
+            imageUrlsInput.value = product.imageUrls.join(', '); // З'єднуємо URLи комою
+        } else {
+            imageUrlsInput.value = '';
+        }
+
+        // Змінюємо заголовок форми
+        document.getElementById('product-add-edit-form').querySelector('h2').textContent = `Редагувати продукт: ${product.name}`;
+
+        showAddProductFormNew(); // Показуємо форму. Тепер вона не буде скидатися автоматично.
+    } catch (error) {
+        console.error('Помилка при завантаженні продукту для редагування:', error);
+        alert('Не вдалося завантажити продукт для редагування: ' + error.message);
     }
 }
 
@@ -84,9 +146,12 @@ function cancelAddProductNew() {
     const productAddEditForm = document.getElementById('product-add-edit-form');
     if (addProductFormContainer && productAddEditForm) {
         addProductFormContainer.style.display = 'none';
-        productAddEditForm.reset(); // Очищуємо поля форми
+        productAddEditForm.reset();
         const categorySelect = document.getElementById('category');
         if (categorySelect) categorySelect.value = '';
+        const imageUrlsInput = document.getElementById('imageUrls');
+        if (imageUrlsInput) imageUrlsInput.value = '';
+        document.getElementById('id').value = '';
     }
 }
 
@@ -98,7 +163,6 @@ async function fetchCategoriesForProductFilterDropdown() {
         const categories = await response.json();
         const categoryFilterSelect = document.getElementById('category-filter');
 
-        // Очищаємо попередні опції, крім "Усі категорії"
         categoryFilterSelect.innerHTML = '<option value="">Усі категорії</option>';
 
         categories.forEach(category => {
@@ -117,9 +181,8 @@ async function fetchCategoriesForProductFormDropdownNew() {
     try {
         const response = await fetch('/api/categories');
         const categories = await response.json();
-        const categorySelect = document.getElementById('category'); // Це select у формі додавання
+        const categorySelect = document.getElementById('category');
 
-        // Очищаємо попередні опції, крім placeholder
         categorySelect.innerHTML = '<option value="">-- Виберіть категорію --</option>';
 
         categories.forEach(category => {
@@ -136,14 +199,13 @@ async function fetchCategoriesForProductFormDropdownNew() {
 // НОВА ФУНКЦІЯ: Завантаження продуктів з можливістю фільтрації за категорією
 async function fetchProductsNew(categoryId = null) {
     try {
-        let url = '/api/products';
+        let url = '/api/products/dto';
         if (categoryId) {
-            url = `/api/products/category/${categoryId}`; // Припустимо, що у вас є такий ендпоінт
+            url = `/api/products/category/${categoryId}`;
         }
 
         const response = await fetch(url);
         if (!response.ok) {
-            // Обробка HTTP помилок (наприклад, 404 Not Found)
             const errorText = await response.text();
             throw new Error(`Помилка завантаження продуктів: ${response.status} ${response.statusText} - ${errorText}`);
         }
@@ -153,8 +215,14 @@ async function fetchProductsNew(categoryId = null) {
             productListHTML += '<p>Немає продуктів у цій категорії або список порожній.</p>';
         } else {
             products.forEach(product => {
-                // Використовуйте product.categoryName, якщо ви його додали в DTO або в геттер Product
-                productListHTML += `<li>${product.name} (${product.categoryName ? product.categoryName : 'Без категорії'}) - ${product.price} грн <button onclick="handleDeleteProductNew(${product.id})">Видалити</button></li>`; // Використовуємо нову функцію видалення
+                const imageUrl = (product.imageUrls && product.imageUrls.length > 0) ? product.imageUrls[0] : 'https://via.placeholder.com/50x50?text=No+Image';
+                productListHTML += `
+                    <li>
+                        <img src="${imageUrl}" alt="${product.name}" style="width:50px; height:50px; object-fit:cover; margin-right:10px;">
+                        ${product.name} (${product.categoryName ? product.categoryName : 'Без категорії'}) - ${product.price} грн
+                        <button onclick="handleEditProductNew(${product.id})">Редагувати</button>
+                        <button onclick="handleDeleteProductNew(${product.id})">Видалити</button>
+                    </li>`;
             });
         }
         productListHTML += '</ul>';
@@ -179,42 +247,50 @@ function filterProductsByCategory() {
     const selectedCategoryId = categoryFilterSelect.value;
 
     if (selectedCategoryId === "") {
-        fetchProductsNew(); // Завантажуємо всі продукти
+        fetchProductsNew();
     } else {
-        fetchProductsNew(selectedCategoryId); // Завантажуємо продукти за вибраною категорією
+        fetchProductsNew(selectedCategoryId);
     }
 }
 
-
-// НОВА ФУНКЦІЯ: Обробник додавання/редагування продукту (копія handleAddProduct)
+// НОВА ФУНКЦІЯ: Обробник додавання/редагування продукту
 async function handleAddProductNew(event) {
-    event.preventDefault(); // Запобігаємо стандартній відправці форми
+    event.preventDefault();
 
     const form = event.target;
     const formData = new FormData(form);
     const productData = {};
 
-    // Збираємо дані з форми
     for (const [key, value] of formData.entries()) {
         productData[key] = value;
     }
 
-    // Перетворюємо ціну та вагу в числові значення
     productData.price = parseFloat(productData.price);
     productData.weight = parseFloat(productData.weight);
 
-    // Отримуємо ID категорії, оскільки бекенд очікує Category ID, а не об'єкт Category
-    const categoryId = productData.category; // Це буде ID категорії
+    const categoryId = productData.category;
     if (categoryId) {
-        productData.category = { id: parseInt(categoryId) }; // Створюємо об'єкт з ID для бекенду
+        productData.categoryId = parseInt(categoryId);
+        delete productData.category;
     } else {
-        productData.category = null; // Або встановлюємо null, якщо категорія необов'язкова
+        productData.categoryId = null;
+        delete productData.category;
     }
 
+    const imageUrlsInput = document.getElementById('imageUrls').value;
+    if (imageUrlsInput) {
+        productData.imageUrls = imageUrlsInput.split(',').map(url => url.trim()).filter(url => url !== '');
+    } else {
+        productData.imageUrls = [];
+    }
+
+    const productId = productData.id;
+    const method = productId ? 'PUT' : 'POST';
+    const url = productId ? `/api/products/dto/${productId}` : '/api/products/dto';
 
     try {
-        const response = await fetch('/api/products', {
-            method: 'POST',
+        const response = await fetch(url, {
+            method: method,
             headers: {
                 'Content-Type': 'application/json'
             },
@@ -223,23 +299,20 @@ async function handleAddProductNew(event) {
 
         if (!response.ok) {
             const errorText = await response.text();
-            throw new Error(`Помилка додавання/редагування продукту: ${response.status} ${response.statusText} - ${errorText}`);
+            throw new Error(`Помилка збереження продукту: ${response.status} ${response.statusText} - ${errorText}`);
         }
 
-        // Очищаємо форму після успішного додавання/редагування
         form.reset();
-        cancelAddProductNew(); // Приховати форму
-
-        // Оновлюємо список продуктів
+        cancelAddProductNew();
         fetchProductsNew();
         alert('Продукт успішно збережено!');
     } catch (error) {
-        console.error('Помилка додавання/редагування продукту:', error);
+        console.error('Помилка збереження продукту:', error);
         alert('Не вдалося зберегти продукт: ' + error.message);
     }
 }
 
-// НОВА ФУНКЦІЯ: Обробник видалення продукту (копія handleDeleteProduct)
+// НОВА ФУНКЦІЯ: Обробник видалення продукту
 async function handleDeleteProductNew(productId) {
     if (!confirm('Ви впевнені, що хочете видалити цей продукт?')) {
         return;
@@ -256,24 +329,56 @@ async function handleDeleteProductNew(productId) {
         }
 
         alert('Продукт успішно видалено!');
-        fetchProductsNew(); // Оновлюємо список продуктів
+        fetchProductsNew();
     } catch (error) {
         console.error('Помилка видалення продукту:', error);
         alert('Не вдалося видалити продукт: ' + error.message);
     }
 }
 
+// НОВА ФУНКЦІЯ: Завантаження продукту для редагування
+async function handleEditProductNew(productId) {
+    try {
+        const response = await fetch(`/api/products/dto/${productId}`);
+        if (!response.ok) {
+            throw new Error(`Помилка завантаження продукту для редагування: ${response.status} ${response.statusText}`);
+        }
+        const product = await response.json();
 
-// Завантаження початкового контенту (замініть showProducts на showProductsWithFilter)
-window.onload = showProductsWithFilter;
-// =====================================================================================================================
+        document.getElementById('id').value = product.id;
+        document.getElementById('name').value = product.name;
+        document.getElementById('price').value = product.price;
+        document.getElementById('producer').value = product.producer;
+        document.getElementById('CountryOfOrigin').value = product.countryOfOrigin;
+        document.getElementById('weight').value = product.weight;
+        document.getElementById('description').value = product.description;
 
-function showAddProductForm() {
-    const addProductForm = document.getElementById('add-product-form');
-    addProductForm.style.display = 'block';
-    fetchCategoriesForDropdown(); // Populate dropdown when form is shown
+        const categorySelect = document.getElementById('category');
+        await fetchCategoriesForProductFormDropdownNew();
+        if (product.categoryId) {
+            categorySelect.value = product.categoryId;
+        } else {
+            categorySelect.value = '';
+        }
+
+        const imageUrlsInput = document.getElementById('imageUrls');
+        if (product.imageUrls && product.imageUrls.length > 0) {
+            imageUrlsInput.value = product.imageUrls.join(', ');
+        } else {
+            imageUrlsInput.value = '';
+        }
+
+        showAddProductFormNew();
+    } catch (error) {
+        console.error('Помилка при завантаженні продукту для редагування:', error);
+        alert('Не вдалося завантажити продукт для редагування: ' + error.message);
+    }
 }
 
+
+window.onload = showProductsWithFilter;
+
+// Функції для клієнтів (без змін)
 function showAddCustomerForm() {
     document.getElementById('add-customer-form').style.display = 'block';
 }
@@ -282,82 +387,6 @@ function showAddCategoryForm() {
     document.getElementById('add-category-form').style.display = 'block';
 }
 
-// Функції для продуктів
-async function fetchProducts() {
-    try {
-        const response = await fetch('/api/products');
-        const products = await response.json();
-        let productListHTML = '<ul>';
-        products.forEach(product => {
-            productListHTML += `<li>${product.name} (${product.category ? product.category.name : 'N/A'}) - ${product.price} грн <button onclick="handleDeleteProduct(${product.id})">Видалити</button></li>`;
-        });
-        productListHTML += '</ul>';
-        document.getElementById('product-list').innerHTML = productListHTML;
-    } catch (error) {
-        console.error(`Помилка завантаження продуктів: ${error.message}`);
-    }
-}
-
-async function handleAddProduct(event) {
-    event.preventDefault();
-    const form = event.target;
-    const formData = new FormData(form);
-
-    const categoryId = parseInt(formData.get('category'), 10);
-    const productData = {
-        name: formData.get('name'),
-        price: parseFloat(formData.get('price')),
-        producer: formData.get('producer'),
-        CountryOfOrigin: formData.get('CountryOfOrigin'),
-        weight: parseFloat(formData.get('weight')),
-        description: formData.get('description'),
-        category: { id: categoryId } // Send category as an object with only the ID
-    };
-
-    try {
-        const response = await fetch('/api/products', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(productData),
-        });
-
-        if (response.ok) {
-            fetchProducts();
-            form.reset();
-            form.style.display = 'none';
-        } else {
-            console.error('Помилка при додаванні продукту:', response.statusText);
-            const errorText = await response.text();
-            console.error('Помилка від сервера:', errorText);
-            alert(`Помилка при додаванні продукту: ${response.statusText}`);
-        }
-    } catch (error) {
-        console.error('Помилка:', error);
-    }
-}
-
-async function handleDeleteProduct(id) {
-    if (confirm('Ви впевнені, що хочете видалити цей продукт?')) {
-        try {
-            const response = await fetch(`/api/products/${id}`, {
-                method: 'DELETE',
-            });
-
-            if (response.ok) {
-                fetchProducts();
-            } else {
-                console.error('Помилка при видаленні продукту:', response.statusText);
-            }
-        } catch (error) {
-            console.error('Помилка:', error);
-        }
-    }
-}
-
-
-// Функції для клієнтів
 async function fetchCustomers() {
     try {
         const response = await fetch('/api/customers');
@@ -418,10 +447,9 @@ async function handleDeleteCustomer(id) {
     }
 }
 
-// Функції для категорій
 async function fetchCategories() {
     try {
-        const response = await fetch('/api/categories'); // Припустимо, що у вас є такий ендпоінт
+        const response = await fetch('/api/categories');
         const categories = await response.json();
         let categoryListHTML = '<ul>';
         categories.forEach(category => {
@@ -431,23 +459,6 @@ async function fetchCategories() {
         document.getElementById('category-list').innerHTML = categoryListHTML;
     } catch (error) {
         console.error('Помилка при завантаженні категорій:', error);
-    }
-}
-
-async function fetchCategoriesForDropdown() {
-    try {
-        const response = await fetch('/api/categories'); // Assuming this endpoint exists
-        const categories = await response.json();
-        const categorySelect = document.getElementById('category');
-
-        categories.forEach(category => {
-            const option = document.createElement('option');
-            option.value = category.id;
-            option.textContent = category.name;
-            categorySelect.appendChild(option);
-        });
-    } catch (error) {
-        console.error('Error fetching categories:', error);
     }
 }
 
@@ -495,6 +506,3 @@ async function handleDeleteCategory(id) {
         }
     }
 }
-
-// Завантаження початкового контенту
-window.onload = showProducts;

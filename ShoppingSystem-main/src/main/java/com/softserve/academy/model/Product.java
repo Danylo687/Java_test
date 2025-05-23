@@ -6,6 +6,8 @@ import java.math.BigDecimal;
 import lombok.*;
 import java.util.Set;
 import java.util.HashSet;
+import java.util.List; // Додано
+import java.util.ArrayList; // Додано
 
 @Entity
 @Getter
@@ -30,6 +32,15 @@ public class Product {
     private String description;
 
     private BigDecimal price;
+
+    // Додано: Поле для списку посилань на зображення
+    // Використовуємо @ElementCollection для збереження списку примітивних типів
+    // У базі даних це може бути окрема таблиця або JSON-масив у деяких БД (залежить від конфігурації JPA/Hibernate)
+    @ElementCollection
+    @CollectionTable(name = "product_images", joinColumns = @JoinColumn(name = "product_id"))
+    @Column(name = "image_url")
+    @Builder.Default // Додано: Для Lombok Builder, щоб ініціалізувати поле за замовчуванням
+    private List<String> imageUrls = new ArrayList<>(); // Додано: Ініціалізація, щоб уникнути NullPointerException
 
 
     @ManyToOne
